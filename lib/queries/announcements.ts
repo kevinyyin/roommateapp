@@ -6,14 +6,17 @@ type Client = SupabaseClient<Database>;
 
 export async function listAnnouncements(
   supabase: Client,
-  householdId: string
+  householdId: string,
+  options?: { limit?: number }
 ): Promise<Announcement[]> {
-  const { data, error } = await supabase
+  const base = supabase
     .from("announcements")
     .select("*")
     .eq("household_id", householdId)
     .order("pinned", { ascending: false })
     .order("created_at", { ascending: false });
+
+  const { data, error } = await (options?.limit !== undefined ? base.limit(options.limit) : base);
 
   if (error) throw error;
   return data;

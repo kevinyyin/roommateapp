@@ -9,7 +9,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Roomly",
-  description: "The shared planner for your household — expenses, chores, groceries, and quiet hours.",
+  description: "The shared planner for your household — expenses, chores, groceries, quiet hours, and announcements.",
 };
 
 const DIRECTION_CONTRACT = `

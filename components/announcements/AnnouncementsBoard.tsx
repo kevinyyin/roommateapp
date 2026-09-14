@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
 import { deleteAnnouncement, setAnnouncementPinned } from "@/lib/queries/announcements";
 import type { Announcement, HouseholdMember } from "@/lib/types";
+import { formatRelativeTime } from "@/lib/dateUtils";
 import { Lane } from "@/components/Lane";
 import { Button } from "@/components/ui/Button";
 import { AddAnnouncementForm } from "./AddAnnouncementForm";
@@ -34,6 +35,7 @@ export function AnnouncementsBoard({
   const [pinOverrides, setPinOverrides] = useState<Record<string, boolean>>({});
   const [pinInFlight, setPinInFlight] = useState<Set<string>>(new Set());
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useRealtimeRefresh(supabase, `announcements-${householdId}`, [
     { table: "announcements", filter: `household_id=eq.${householdId}` },
@@ -75,10 +77,14 @@ export function AnnouncementsBoard({
   }
 
   async function handleDelete(item: Announcement) {
+    if (!window.confirm(`Delete "${item.title}"? This can't be undone.`)) return;
     setDeletingId(item.id);
+    setDeleteError(null);
     try {
       await deleteAnnouncement(supabase, item.id);
       router.refresh();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Couldn't delete announcement.");
     } finally {
       setDeletingId(null);
     }
@@ -94,6 +100,8 @@ export function AnnouncementsBoard({
         </Button>
       )}
 
+      {deleteError && <p className="text-sm text-danger">{deleteError}</p>}
+
       <div className="space-y-3">
         {displayAnnouncements.length === 0 && (
           <p className="text-center text-sm text-ink-soft">No announcements yet.</p>
@@ -103,7 +111,7 @@ export function AnnouncementsBoard({
             <p className="whitespace-pre-wrap text-sm text-ink">{item.body}</p>
             <div className="mt-3 flex items-center justify-between gap-3 text-xs text-ink-soft">
               <span>
-                {nameById.get(item.author_id) ?? "someone"} · {new Date(item.created_at).toLocaleDateString()}
+                {nameById.get(item.author_id) ?? "someone"} · {formatRelativeTime(item.created_at)}
               </span>
               <div className="flex shrink-0 gap-2">
                 <Button

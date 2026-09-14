@@ -27,7 +27,7 @@ export function BottomNav() {
                 style={{ color: active ? meta.color : "var(--color-ink-soft)" }}
               >
                 <Icon className="h-6 w-6" strokeWidth={active ? 2 : 1.75} />
-                {meta.label}
+                <span className="max-w-full truncate px-0.5">{meta.label}</span>
               </Link>
             </li>
           );

@@ -22,7 +22,7 @@ export default async function DashboardOverviewPage() {
     listChores(supabase, household.id),
     listGroceryItems(supabase, household.id),
     listQuietHours(supabase, household.id),
-    listAnnouncements(supabase, household.id),
+    listAnnouncements(supabase, household.id, { limit: 2 }),
   ]);
 
   const nameById = new Map(members.map((m) => [m.user_id, m.display_name]));
@@ -40,7 +40,7 @@ export default async function DashboardOverviewPage() {
         <Link href="/dashboard/announcements">
           <Lane category="announcements">
             <ul className="space-y-1.5">
-              {announcements.slice(0, 2).map((a) => (
+              {announcements.map((a) => (
                 <li key={a.id} className="text-sm">
                   <span className="font-semibold text-ink">{a.title}</span>{" "}
                   <span className="text-ink-soft">— {nameById.get(a.author_id) ?? "someone"}</span>
