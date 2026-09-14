@@ -49,8 +49,8 @@ export function AddChoreForm({
       });
       router.refresh();
       onDone();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't add chore.");
+    } catch {
+      setError("Couldn't add chore. Please try again.");
     } finally {
       setSubmitting(false);
     }

@@ -37,8 +37,8 @@ export function AddAnnouncementForm({
       });
       router.refresh();
       onDone();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't post announcement.");
+    } catch {
+      setError("Couldn't post announcement. Please try again.");
     } finally {
       setSubmitting(false);
     }

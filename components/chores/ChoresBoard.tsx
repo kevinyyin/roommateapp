@@ -28,6 +28,7 @@ export function ChoresBoard({
   const supabase = createClient();
   const [adding, setAdding] = useState(false);
   const [working, setWorking] = useState<string | null>(null);
+  const [doneError, setDoneError] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "calendar">("list");
 
   const { flashId, flash } = useFlashOnChange();
@@ -51,9 +52,12 @@ export function ChoresBoard({
   async function handleDone(chore: ChoreWithAssignment) {
     if (!chore.current_assignment) return;
     setWorking(chore.id);
+    setDoneError(null);
     try {
       await markChoreDone(supabase, { assignment: chore.current_assignment, choreId: chore.id, members });
       router.refresh();
+    } catch {
+      setDoneError("Couldn't mark that chore done. Please try again.");
     } finally {
       setWorking(null);
     }
@@ -77,6 +81,8 @@ export function ChoresBoard({
           Calendar
         </Button>
       </div>
+
+      {doneError && <p className="text-sm text-danger">{doneError}</p>}
 
       {view === "calendar" ? (
         <ChoresCalendar members={members} chores={chores} />

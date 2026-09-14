@@ -66,8 +66,8 @@ export function AddExpenseForm({
       });
       router.refresh();
       onDone();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't add expense.");
+    } catch {
+      setError("Couldn't add expense. Please try again.");
     } finally {
       setSubmitting(false);
     }

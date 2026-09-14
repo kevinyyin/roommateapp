@@ -34,6 +34,7 @@ export function MyScheduleEditor({
   const router = useRouter();
   const [days, setDays] = useState<DayState[]>(() => initialState(myEntries));
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function update(index: number, patch: Partial<DayState>) {
     setDays((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
@@ -41,6 +42,7 @@ export function MyScheduleEditor({
 
   async function handleSave() {
     setSaving(true);
+    setError(null);
     try {
       const supabase = createClient();
       await setMyQuietHours(supabase, {
@@ -53,6 +55,8 @@ export function MyScheduleEditor({
       });
       router.refresh();
       onDone();
+    } catch {
+      setError("Couldn't save your schedule. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -83,6 +87,7 @@ export function MyScheduleEditor({
           />
         </div>
       ))}
+      {error && <p className="text-sm text-danger">{error}</p>}
       <div className="flex gap-2 pt-1">
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Saving…" : "Save my schedule"}

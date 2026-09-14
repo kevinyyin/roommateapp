@@ -89,8 +89,8 @@ export function AnnouncementsBoard({
     try {
       await deleteAnnouncement(supabase, item.id);
       router.refresh();
-    } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Couldn't delete announcement.");
+    } catch {
+      setDeleteError("Couldn't delete announcement. Please try again.");
     } finally {
       setDeletingId(null);
     }

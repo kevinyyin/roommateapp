@@ -29,6 +29,7 @@ export function GroceriesBoard({
   const [adding, setAdding] = useState(false);
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [inFlight, setInFlight] = useState<Set<string>>(new Set());
+  const [addError, setAddError] = useState<string | null>(null);
 
   const { flashId, flash } = useFlashOnChange();
 
@@ -60,10 +61,13 @@ export function GroceriesBoard({
     e.preventDefault();
     if (!name.trim()) return;
     setAdding(true);
+    setAddError(null);
     try {
       await addGroceryItem(supabase, { householdId, name: name.trim(), addedBy: currentUserId });
       setName("");
       router.refresh();
+    } catch {
+      setAddError("Couldn't add that item. Please try again.");
     } finally {
       setAdding(false);
     }
@@ -95,6 +99,7 @@ export function GroceriesBoard({
           Add
         </Button>
       </form>
+      {addError && <p className="text-sm text-danger">{addError}</p>}
 
       <Lane category="groceries" title={`Needed (${pending.length})`}>
         {pending.length === 0 ? (
