@@ -17,15 +17,22 @@ export function Lane({
   title,
   action,
   children,
+  flash = false,
 }: {
   category: Category;
   title?: string;
   action?: ReactNode;
   children: ReactNode;
+  // Briefly ring the lane when a realtime update just changed this row, so
+  // it visibly arrives instead of silently reshuffling under a thumb.
+  flash?: boolean;
 }) {
   const meta = CATEGORY_META[category];
   return (
-    <section className="rounded-xl p-4 sm:p-5" style={{ backgroundColor: meta.tint }}>
+    <section
+      className={`rounded-xl p-4 transition-shadow duration-700 sm:p-5 ${flash ? "ring-2 ring-action" : "ring-2 ring-transparent"}`}
+      style={{ backgroundColor: meta.tint }}
+    >
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-ink">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: meta.color }} />

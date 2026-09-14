@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
+import { useFlashOnChange } from "@/lib/hooks/useFlashOnChange";
 import { computeBalances, setSplitSettled } from "@/lib/queries/expenses";
 import type { ExpenseWithSplits, HouseholdMember } from "@/lib/types";
 import { Lane } from "@/components/Lane";
@@ -28,10 +29,17 @@ export function ExpensesBoard({
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [inFlight, setInFlight] = useState<Set<string>>(new Set());
 
-  useRealtimeRefresh(supabase, `expenses-${householdId}`, [
-    { table: "expenses", filter: `household_id=eq.${householdId}` },
-    { table: "expense_splits" },
-  ]);
+  const { flashId, flash } = useFlashOnChange();
+
+  useRealtimeRefresh(
+    supabase,
+    `expenses-${householdId}`,
+    [
+      { table: "expenses", filter: `household_id=eq.${householdId}` },
+      { table: "expense_splits" },
+    ],
+    (change) => flash((change.new ?? change.old)?.id as string | undefined)
+  );
 
   // Once fresh server data agrees with an optimistic override, drop it so a
   // later change (ours or a roommate's) isn't masked by stale local state.
@@ -108,7 +116,12 @@ export function ExpensesBoard({
       <div className="space-y-3">
         {displayExpenses.length === 0 && <p className="text-center text-sm text-ink-soft">No expenses logged yet.</p>}
         {displayExpenses.map((expense) => (
-          <div key={expense.id} className="ruled rounded-xl bg-paper-raised p-4">
+          <div
+            key={expense.id}
+            className={`ruled rounded-xl bg-paper-raised p-4 ring-2 transition-shadow duration-700 ${
+              flashId === expense.id ? "ring-action" : "ring-transparent"
+            }`}
+          >
             <div className="flex items-baseline justify-between">
               <p className="font-semibold text-ink">{expense.description}</p>
               <p className="tabular font-bold" style={{ color: "var(--color-expenses)" }}>
@@ -120,7 +133,12 @@ export function ExpensesBoard({
               {expense.expense_splits
                 .filter((split) => split.user_id !== expense.payer_id)
                 .map((split) => (
-                  <li key={split.id} className="flex items-center gap-2.5 text-sm">
+                  <li
+                    key={split.id}
+                    className={`flex items-center gap-2.5 rounded-lg p-1 text-sm ring-2 transition-shadow duration-700 ${
+                      flashId === split.id ? "ring-action" : "ring-transparent"
+                    }`}
+                  >
                     <Checkbox
                       checked={split.settled}
                       onChange={() => toggleSettled(split.id, split.settled)}

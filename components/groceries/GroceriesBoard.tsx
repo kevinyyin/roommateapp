@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
+import { useFlashOnChange } from "@/lib/hooks/useFlashOnChange";
 import { addGroceryItem, setGroceryItemBought } from "@/lib/queries/groceries";
 import type { GroceryItem, HouseholdMember } from "@/lib/types";
 import { Lane } from "@/components/Lane";
@@ -29,9 +30,14 @@ export function GroceriesBoard({
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [inFlight, setInFlight] = useState<Set<string>>(new Set());
 
-  useRealtimeRefresh(supabase, `groceries-${householdId}`, [
-    { table: "grocery_items", filter: `household_id=eq.${householdId}` },
-  ]);
+  const { flashId, flash } = useFlashOnChange();
+
+  useRealtimeRefresh(
+    supabase,
+    `groceries-${householdId}`,
+    [{ table: "grocery_items", filter: `household_id=eq.${householdId}` }],
+    (change) => flash((change.new ?? change.old)?.id as string | undefined)
+  );
 
   // Once fresh server data agrees with an optimistic override, drop it so a
   // later change (ours or a roommate's) isn't masked by stale local state.
@@ -96,7 +102,12 @@ export function GroceriesBoard({
         ) : (
           <ul className="space-y-2">
             {pending.map((item) => (
-              <li key={item.id} className="flex items-center gap-2.5 text-sm">
+              <li
+                key={item.id}
+                className={`flex items-center gap-2.5 rounded-lg p-1 text-sm ring-2 transition-shadow duration-700 ${
+                  flashId === item.id ? "ring-action" : "ring-transparent"
+                }`}
+              >
                 <Checkbox
                   checked={item.bought}
                   onChange={() => toggle(item)}
@@ -116,7 +127,12 @@ export function GroceriesBoard({
         <Lane category="groceries" title={`Bought (${bought.length})`}>
           <ul className="space-y-2">
             {bought.map((item) => (
-              <li key={item.id} className="flex items-center gap-2.5 text-sm">
+              <li
+                key={item.id}
+                className={`flex items-center gap-2.5 rounded-lg p-1 text-sm ring-2 transition-shadow duration-700 ${
+                  flashId === item.id ? "ring-action" : "ring-transparent"
+                }`}
+              >
                 <Checkbox
                   checked={item.bought}
                   onChange={() => toggle(item)}

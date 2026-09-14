@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
+import { useFlashOnChange } from "@/lib/hooks/useFlashOnChange";
 import { deleteAnnouncement, setAnnouncementPinned } from "@/lib/queries/announcements";
 import type { Announcement, HouseholdMember } from "@/lib/types";
 import { formatRelativeTime } from "@/lib/dateUtils";
@@ -37,9 +38,14 @@ export function AnnouncementsBoard({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  useRealtimeRefresh(supabase, `announcements-${householdId}`, [
-    { table: "announcements", filter: `household_id=eq.${householdId}` },
-  ]);
+  const { flashId, flash } = useFlashOnChange();
+
+  useRealtimeRefresh(
+    supabase,
+    `announcements-${householdId}`,
+    [{ table: "announcements", filter: `household_id=eq.${householdId}` }],
+    (change) => flash((change.new ?? change.old)?.id as string | undefined)
+  );
 
   // Once fresh server data agrees with an optimistic override, drop it so a
   // later change (ours or a roommate's) isn't masked by stale local state.
@@ -107,7 +113,7 @@ export function AnnouncementsBoard({
           <p className="text-center text-sm text-ink-soft">No announcements yet.</p>
         )}
         {displayAnnouncements.map((item) => (
-          <Lane key={item.id} category="announcements" title={item.title}>
+          <Lane key={item.id} category="announcements" title={item.title} flash={flashId === item.id}>
             <p className="whitespace-pre-wrap text-sm text-ink">{item.body}</p>
             <div className="mt-3 flex items-center justify-between gap-3 text-xs text-ink-soft">
               <span>

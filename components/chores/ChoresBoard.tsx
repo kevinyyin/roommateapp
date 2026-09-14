@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
+import { useFlashOnChange } from "@/lib/hooks/useFlashOnChange";
 import { markChoreDone } from "@/lib/queries/chores";
 import type { ChoreWithAssignment, HouseholdMember } from "@/lib/types";
 import { WEEKDAY_LABELS } from "@/lib/dateUtils";
@@ -29,10 +30,21 @@ export function ChoresBoard({
   const [working, setWorking] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "calendar">("list");
 
-  useRealtimeRefresh(supabase, `chores-${householdId}`, [
-    { table: "chores", filter: `household_id=eq.${householdId}` },
-    { table: "chore_assignments" },
-  ]);
+  const { flashId, flash } = useFlashOnChange();
+
+  useRealtimeRefresh(
+    supabase,
+    `chores-${householdId}`,
+    [
+      { table: "chores", filter: `household_id=eq.${householdId}` },
+      { table: "chore_assignments" },
+    ],
+    (change) => {
+      const row = change.new ?? change.old;
+      if (!row) return;
+      flash(change.table === "chores" ? (row.id as string) : (row.chore_id as string));
+    }
+  );
 
   const nameById = new Map(members.map((m) => [m.user_id, m.display_name]));
 
@@ -72,7 +84,7 @@ export function ChoresBoard({
         <div className="space-y-3">
           {chores.length === 0 && <p className="text-center text-sm text-ink-soft">No chores yet.</p>}
           {chores.map((chore) => (
-            <Lane key={chore.id} category="chores" title={chore.name}>
+            <Lane key={chore.id} category="chores" title={chore.name} flash={flashId === chore.id}>
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm text-ink">
