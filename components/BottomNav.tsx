@@ -23,7 +23,7 @@ export function BottomNav() {
             <li key={tab} className="flex-1">
               <Link
                 href={meta.href}
-                className="flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold"
+                className="flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold transition duration-100 active:scale-95"
                 style={{ color: active ? meta.color : "var(--color-ink-soft)" }}
               >
                 <Icon className="h-6 w-6" strokeWidth={active ? 2 : 1.75} />
