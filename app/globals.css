@@ -21,6 +21,8 @@
   --color-groceries-tint: #faf0dc;
   --color-quiet: #5b46c2;
   --color-quiet-tint: #ece8fa;
+  --color-announcements: #b1467c;
+  --color-announcements-tint: #f6e8ef;
 
   --color-danger: #c23b3b;
 }
@@ -41,6 +43,8 @@
   --color-groceries-tint: var(--color-groceries-tint);
   --color-quiet: var(--color-quiet);
   --color-quiet-tint: var(--color-quiet-tint);
+  --color-announcements: var(--color-announcements);
+  --color-announcements-tint: var(--color-announcements-tint);
   --color-danger: var(--color-danger);
   --font-sans: var(--font-inter);
 }

@@ -46,9 +46,19 @@ export function QuietHoursIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function AnnouncementsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 4.5h9l-1.2 5.2L18 15H9" />
+      <path d="M9 4.5v15" />
+    </svg>
+  );
+}
+
 export const CATEGORY_ICONS = {
   expenses: ExpensesIcon,
   chores: ChoresIcon,
   groceries: GroceriesIcon,
   quiet: QuietHoursIcon,
+  announcements: AnnouncementsIcon,
 } as const;

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { CATEGORY_META, type Category } from "./Lane";
 import { CATEGORY_ICONS } from "./icons";
 
-const TABS: Category[] = ["expenses", "chores", "groceries", "quiet"];
+const TABS: Category[] = ["expenses", "chores", "groceries", "quiet", "announcements"];
 
 // Persistent thumb-reachable action bar — donated from the "Everyday App"
 // challenger so navigation stays reachable one-handed on a phone.

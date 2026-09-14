@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
 
-export type Category = "expenses" | "chores" | "groceries" | "quiet";
+export type Category = "expenses" | "chores" | "groceries" | "quiet" | "announcements";
 
 export const CATEGORY_META: Record<Category, { label: string; color: string; tint: string; href: string }> = {
   expenses: { label: "Expenses", color: "var(--color-expenses)", tint: "var(--color-expenses-tint)", href: "/dashboard/expenses" },
   chores: { label: "Chores", color: "var(--color-chores)", tint: "var(--color-chores-tint)", href: "/dashboard/chores" },
   groceries: { label: "Groceries", color: "var(--color-groceries)", tint: "var(--color-groceries-tint)", href: "/dashboard/groceries" },
   quiet: { label: "Quiet Hours", color: "var(--color-quiet)", tint: "var(--color-quiet-tint)", href: "/dashboard/quiet-hours" },
+  announcements: { label: "Announcements", color: "var(--color-announcements)", tint: "var(--color-announcements-tint)", href: "/dashboard/announcements" },
 };
 
 // A horizontal highlighter-tinted lane — the recurring unit of the weekly
