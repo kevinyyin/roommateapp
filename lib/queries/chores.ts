@@ -43,7 +43,13 @@ export async function listChores(
 
 export async function addChore(
   supabase: Client,
-  input: { householdId: string; name: string; recurrenceDays: number; firstAssigneeId: string }
+  input: {
+    householdId: string;
+    name: string;
+    recurrenceDays: number;
+    firstAssigneeId: string;
+    dayOfWeek?: number | null;
+  }
 ): Promise<Chore> {
   const { data: chore, error: choreError } = await supabase
     .from("chores")
@@ -51,6 +57,7 @@ export async function addChore(
       household_id: input.householdId,
       name: input.name,
       recurrence_days: input.recurrenceDays,
+      day_of_week: input.recurrenceDays === 7 ? input.dayOfWeek ?? null : null,
     })
     .select()
     .single();

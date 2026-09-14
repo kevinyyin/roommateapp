@@ -6,9 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
 import { markChoreDone } from "@/lib/queries/chores";
 import type { ChoreWithAssignment, HouseholdMember } from "@/lib/types";
+import { WEEKDAY_LABELS } from "@/lib/dateUtils";
 import { Lane } from "@/components/Lane";
 import { Button } from "@/components/ui/Button";
 import { AddChoreForm } from "./AddChoreForm";
+import { ChoresCalendar } from "./ChoresCalendar";
 
 const RECURRENCE_LABEL: Record<number, string> = { 1: "daily", 7: "weekly", 14: "biweekly", 30: "monthly" };
 
@@ -25,6 +27,7 @@ export function ChoresBoard({
   const supabase = createClient();
   const [adding, setAdding] = useState(false);
   const [working, setWorking] = useState<string | null>(null);
+  const [view, setView] = useState<"list" | "calendar">("list");
 
   useRealtimeRefresh(supabase, `chores-${householdId}`, [
     { table: "chores", filter: `household_id=eq.${householdId}` },
@@ -54,26 +57,40 @@ export function ChoresBoard({
         </Button>
       )}
 
-      <div className="space-y-3">
-        {chores.length === 0 && <p className="text-center text-sm text-ink-soft">No chores yet.</p>}
-        {chores.map((chore) => (
-          <Lane key={chore.id} category="chores" title={chore.name}>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm text-ink">
-                  <span className="font-semibold">
-                    {chore.current_assignment ? nameById.get(chore.current_assignment.user_id) : "unassigned"}
-                  </span>{" "}
-                  is up ({RECURRENCE_LABEL[chore.recurrence_days] ?? `every ${chore.recurrence_days}d`})
-                </p>
-              </div>
-              <Button onClick={() => handleDone(chore)} disabled={working === chore.id} className="shrink-0">
-                {working === chore.id ? "…" : "Done"}
-              </Button>
-            </div>
-          </Lane>
-        ))}
+      <div className="flex gap-2">
+        <Button variant={view === "list" ? "action" : "ghost"} onClick={() => setView("list")}>
+          List
+        </Button>
+        <Button variant={view === "calendar" ? "action" : "ghost"} onClick={() => setView("calendar")}>
+          Calendar
+        </Button>
       </div>
+
+      {view === "calendar" ? (
+        <ChoresCalendar members={members} chores={chores} />
+      ) : (
+        <div className="space-y-3">
+          {chores.length === 0 && <p className="text-center text-sm text-ink-soft">No chores yet.</p>}
+          {chores.map((chore) => (
+            <Lane key={chore.id} category="chores" title={chore.name}>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm text-ink">
+                    <span className="font-semibold">
+                      {chore.current_assignment ? nameById.get(chore.current_assignment.user_id) : "unassigned"}
+                    </span>{" "}
+                    is up ({RECURRENCE_LABEL[chore.recurrence_days] ?? `every ${chore.recurrence_days}d`}
+                    {chore.day_of_week !== null ? `, ${WEEKDAY_LABELS[chore.day_of_week]}` : ""})
+                  </p>
+                </div>
+                <Button onClick={() => handleDone(chore)} disabled={working === chore.id} className="shrink-0">
+                  {working === chore.id ? "…" : "Done"}
+                </Button>
+              </div>
+            </Lane>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

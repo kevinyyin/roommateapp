@@ -7,6 +7,7 @@ import { addChore } from "@/lib/queries/chores";
 import type { HouseholdMember } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { WEEKDAY_LABELS } from "@/lib/dateUtils";
 
 const RECURRENCE_OPTIONS = [
   { label: "Daily", days: 1 },
@@ -27,6 +28,7 @@ export function AddChoreForm({
   const router = useRouter();
   const [name, setName] = useState("");
   const [recurrenceDays, setRecurrenceDays] = useState(7);
+  const [dayOfWeek, setDayOfWeek] = useState<string>("");
   const [firstAssigneeId, setFirstAssigneeId] = useState(members[0]?.user_id ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,13 @@ export function AddChoreForm({
     setError(null);
     try {
       const supabase = createClient();
-      await addChore(supabase, { householdId, name: name.trim(), recurrenceDays, firstAssigneeId });
+      await addChore(supabase, {
+        householdId,
+        name: name.trim(),
+        recurrenceDays,
+        firstAssigneeId,
+        dayOfWeek: dayOfWeek === "" ? null : Number(dayOfWeek),
+      });
       router.refresh();
       onDone();
     } catch (err) {
@@ -60,13 +68,17 @@ export function AddChoreForm({
           required
         />
       </div>
-      <div className="flex gap-4">
-        <div className="flex-1">
+      <div className="flex flex-wrap gap-4">
+        <div className="min-w-[7rem] flex-1">
           <Label htmlFor="recurrence">Repeats</Label>
           <select
             id="recurrence"
             value={recurrenceDays}
-            onChange={(e) => setRecurrenceDays(Number(e.target.value))}
+            onChange={(e) => {
+              const days = Number(e.target.value);
+              setRecurrenceDays(days);
+              if (days !== 7) setDayOfWeek("");
+            }}
             className="w-full border-0 border-b-2 border-rule bg-transparent py-2 text-base focus:border-action focus:outline-none"
           >
             {RECURRENCE_OPTIONS.map((opt) => (
@@ -76,7 +88,25 @@ export function AddChoreForm({
             ))}
           </select>
         </div>
-        <div className="flex-1">
+        {recurrenceDays === 7 && (
+          <div className="min-w-[7rem] flex-1">
+            <Label htmlFor="day-of-week">Day</Label>
+            <select
+              id="day-of-week"
+              value={dayOfWeek}
+              onChange={(e) => setDayOfWeek(e.target.value)}
+              className="w-full border-0 border-b-2 border-rule bg-transparent py-2 text-base focus:border-action focus:outline-none"
+            >
+              <option value="">No specific day</option>
+              {WEEKDAY_LABELS.map((label, i) => (
+                <option key={label} value={i}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="min-w-[7rem] flex-1">
           <Label htmlFor="first-assignee">Starts with</Label>
           <select
             id="first-assignee"
