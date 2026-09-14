@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CATEGORY_META, type Category } from "./Lane";
+import { CATEGORY_ICONS } from "./icons";
 
 const TABS: Category[] = ["expenses", "chores", "groceries", "quiet"];
 
@@ -16,6 +17,7 @@ export function BottomNav() {
       <ul className="mx-auto flex max-w-2xl">
         {TABS.map((tab) => {
           const meta = CATEGORY_META[tab];
+          const Icon = CATEGORY_ICONS[tab];
           const active = pathname.startsWith(meta.href);
           return (
             <li key={tab} className="flex-1">
@@ -24,10 +26,7 @@ export function BottomNav() {
                 className="flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold"
                 style={{ color: active ? meta.color : "var(--color-ink-soft)" }}
               >
-                <span
-                  className="h-1.5 w-6 rounded-full transition-colors"
-                  style={{ backgroundColor: active ? meta.color : "transparent" }}
-                />
+                <Icon className="h-6 w-6" strokeWidth={active ? 2 : 1.75} />
                 {meta.label}
               </Link>
             </li>
