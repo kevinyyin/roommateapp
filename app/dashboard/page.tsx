@@ -5,6 +5,7 @@ import { listExpenses, computeBalances } from "@/lib/queries/expenses";
 import { listChores } from "@/lib/queries/chores";
 import { listGroceryItems } from "@/lib/queries/groceries";
 import { listQuietHours } from "@/lib/queries/quietHours";
+import { listAnnouncements } from "@/lib/queries/announcements";
 import { Lane } from "@/components/Lane";
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -15,12 +16,13 @@ export default async function DashboardOverviewPage() {
   if (!context) return null;
   const { household, membership } = context;
 
-  const [members, expenses, chores, groceries, quietHours] = await Promise.all([
+  const [members, expenses, chores, groceries, quietHours, announcements] = await Promise.all([
     getHouseholdMembers(supabase, household.id),
     listExpenses(supabase, household.id),
     listChores(supabase, household.id),
     listGroceryItems(supabase, household.id),
     listQuietHours(supabase, household.id),
+    listAnnouncements(supabase, household.id),
   ]);
 
   const nameById = new Map(members.map((m) => [m.user_id, m.display_name]));
@@ -33,6 +35,21 @@ export default async function DashboardOverviewPage() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-ink-soft">This week&apos;s spread for {household.name}.</p>
+
+      {announcements.length > 0 && (
+        <Link href="/dashboard/announcements">
+          <Lane category="announcements">
+            <ul className="space-y-1.5">
+              {announcements.slice(0, 2).map((a) => (
+                <li key={a.id} className="text-sm">
+                  <span className="font-semibold text-ink">{a.title}</span>{" "}
+                  <span className="text-ink-soft">— {nameById.get(a.author_id) ?? "someone"}</span>
+                </li>
+              ))}
+            </ul>
+          </Lane>
+        </Link>
+      )}
 
       <Link href="/dashboard/expenses">
         <Lane category="expenses">
