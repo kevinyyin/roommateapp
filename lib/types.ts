@@ -8,6 +8,7 @@ export type Chore = Tables<"chores">;
 export type ChoreAssignment = Tables<"chore_assignments">;
 export type GroceryItem = Tables<"grocery_items">;
 export type QuietHoursEntry = Tables<"quiet_hours">;
+export type Announcement = Tables<"announcements">;
 
 export type ExpenseWithSplits = Expense & { expense_splits: ExpenseSplit[] };
 export type ChoreWithAssignment = Chore & { current_assignment: ChoreAssignment | null };

@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          household_id: string
+          id: string
+          pinned: boolean
+          title: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          household_id: string
+          id?: string
+          pinned?: boolean
+          title: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          household_id?: string
+          id?: string
+          pinned?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chore_assignments: {
         Row: {
           chore_id: string
