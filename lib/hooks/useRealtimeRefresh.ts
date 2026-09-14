@@ -23,7 +23,9 @@ export function useRealtimeRefresh(
 ) {
   const router = useRouter();
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
   useEffect(() => {
     const channel = supabase.channel(channelName);
