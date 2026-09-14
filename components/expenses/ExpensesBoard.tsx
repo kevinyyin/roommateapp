@@ -121,7 +121,7 @@ export function ExpensesBoard({
         {displayExpenses.map((expense) => (
           <div
             key={expense.id}
-            className={`ruled rounded-xl bg-paper-raised p-4 ring-2 transition-shadow duration-700 ${
+            className={`rounded-xl bg-paper-raised p-4 ring-2 transition-shadow duration-700 ${
               flashId === expense.id ? "ring-action" : "ring-transparent"
             }`}
           >

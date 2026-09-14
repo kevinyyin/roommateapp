@@ -10,14 +10,14 @@ export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signup, undefined);
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
+    <main className="ruled flex flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-action">Roomly</p>
           <h1 className="mt-2 text-2xl font-bold text-ink">Create your account</h1>
         </div>
 
-        <form action={formAction} className="ruled space-y-5 rounded-xl bg-paper-raised p-6 shadow-sm">
+        <form action={formAction} className="space-y-5 rounded-xl bg-paper-raised p-6 shadow-sm">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" required autoComplete="email" />

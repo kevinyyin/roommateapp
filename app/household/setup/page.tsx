@@ -11,7 +11,7 @@ export default function HouseholdSetupPage() {
   const [joinState, joinAction, joining] = useActionState(joinHouseholdAction, undefined);
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
+    <main className="ruled flex flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-action">Roomly</p>
@@ -33,7 +33,7 @@ export default function HouseholdSetupPage() {
         </div>
 
         {tab === "create" ? (
-          <form action={createAction} className="ruled space-y-5 rounded-xl bg-paper-raised p-6 shadow-sm">
+          <form action={createAction} className="space-y-5 rounded-xl bg-paper-raised p-6 shadow-sm">
             <div>
               <Label htmlFor="name">Household name</Label>
               <Input id="name" name="name" placeholder="e.g. 214 Maple St" required />
@@ -44,7 +44,7 @@ export default function HouseholdSetupPage() {
             </Button>
           </form>
         ) : (
-          <form action={joinAction} className="ruled space-y-5 rounded-xl bg-paper-raised p-6 shadow-sm">
+          <form action={joinAction} className="space-y-5 rounded-xl bg-paper-raised p-6 shadow-sm">
             <div>
               <Label htmlFor="code">Invite code</Label>
               <Input

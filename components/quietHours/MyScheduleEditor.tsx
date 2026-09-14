@@ -63,7 +63,7 @@ export function MyScheduleEditor({
   }
 
   return (
-    <div className="ruled space-y-3 rounded-xl bg-paper-raised p-4">
+    <div className="space-y-3 rounded-xl bg-paper-raised p-4">
       {days.map((d, i) => (
         <div key={i} className="flex items-center gap-3">
           <label className="flex w-12 items-center gap-2 text-sm font-medium text-ink">

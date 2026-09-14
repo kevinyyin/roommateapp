@@ -74,7 +74,7 @@ export function AddExpenseForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="ruled space-y-4 rounded-xl bg-paper-raised p-4">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-paper-raised p-4">
       <div>
         <Label htmlFor="description">What for</Label>
         <Input
