@@ -55,6 +55,15 @@ export function AnnouncementsIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function HomeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4.5 11.5 12 4.5l7.5 7" />
+      <path d="M6.5 10v8.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V10" />
+    </svg>
+  );
+}
+
 export const CATEGORY_ICONS = {
   expenses: ExpensesIcon,
   chores: ChoresIcon,

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { ChoreWithAssignment, HouseholdMember } from "@/lib/types";
-import { addDays, getMonthGrid, isSameDay, WEEKDAY_LABELS } from "@/lib/dateUtils";
+import { getMonthGrid, isChoreDueOn, isSameDay, WEEKDAY_LABELS } from "@/lib/dateUtils";
 import { Button } from "@/components/ui/Button";
 
 type DayEntry = { choreId: string; choreName: string; assigneeName: string };
@@ -34,16 +34,10 @@ export function ChoresCalendar({
         ? nameById.get(chore.current_assignment.user_id) ?? "unassigned"
         : "unassigned";
 
-      if (chore.recurrence_days === 7 && chore.day_of_week !== null) {
-        for (const date of grid) {
-          if (date.getDay() === chore.day_of_week) {
-            add(date, { choreId: chore.id, choreName: chore.name, assigneeName });
-          }
+      for (const date of grid) {
+        if (isChoreDueOn(chore, chore.current_assignment?.cycle_start, date)) {
+          add(date, { choreId: chore.id, choreName: chore.name, assigneeName });
         }
-      } else if (chore.current_assignment) {
-        const dueDate = addDays(new Date(chore.current_assignment.cycle_start), chore.recurrence_days);
-        const match = grid.find((date) => isSameDay(date, dueDate));
-        if (match) add(match, { choreId: chore.id, choreName: chore.name, assigneeName });
       }
     }
     return map;

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMyHousehold } from "@/lib/queries/household";
@@ -15,10 +16,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="flex flex-1 flex-col">
       <header className="border-b border-rule px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <div>
+          <Link href="/dashboard" className="block">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-action">Roomly</p>
             <h1 className="text-lg font-bold text-ink">{household.name}</h1>
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
             <span className="rounded-md border border-rule px-2 py-1 font-mono text-xs tabular text-ink-soft">
               {household.invite_code}

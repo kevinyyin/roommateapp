@@ -24,6 +24,45 @@ export function getMonthGrid(year: number, month: number): Date[] {
   return Array.from({ length: 42 }, (_, i) => addDays(gridStart, i));
 }
 
+// The Sun-Sat week containing the given date.
+export function getWeekDays(date: Date): Date[] {
+  const weekStart = addDays(startOfDay(date), -date.getDay());
+  return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+}
+
+// Same due-date rule the chores calendar uses: a pinned weekly chore repeats
+// on its weekday every week; anything else has a single next occurrence at
+// cycle_start + recurrence_days.
+export function isChoreDueOn(
+  chore: { recurrence_days: number; day_of_week: number | null },
+  cycleStart: string | null | undefined,
+  date: Date
+): boolean {
+  if (chore.recurrence_days === 7 && chore.day_of_week !== null) {
+    return date.getDay() === chore.day_of_week;
+  }
+  if (!cycleStart) return false;
+  return isSameDay(addDays(new Date(cycleStart), chore.recurrence_days), date);
+}
+
+// The soonest date strictly after `from` that the chore is next due, or null
+// when it can't be computed (no day picked, no active assignment).
+export function nextChoreDueDate(
+  chore: { recurrence_days: number; day_of_week: number | null },
+  cycleStart: string | null | undefined,
+  from: Date
+): Date | null {
+  if (chore.recurrence_days === 7 && chore.day_of_week !== null) {
+    for (let i = 1; i <= 7; i++) {
+      const candidate = addDays(from, i);
+      if (candidate.getDay() === chore.day_of_week) return candidate;
+    }
+    return null;
+  }
+  if (!cycleStart) return null;
+  return addDays(new Date(cycleStart), chore.recurrence_days);
+}
+
 // Coarse relative time ("2h ago") — deliberately locale/timezone-independent
 // (unlike toLocaleDateString) so server-rendered and client-hydrated output
 // can't disagree because the server and browser sit in different zones.
