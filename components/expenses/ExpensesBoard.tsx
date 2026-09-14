@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
@@ -25,18 +25,53 @@ export function ExpensesBoard({
   const router = useRouter();
   const supabase = createClient();
   const [adding, setAdding] = useState(false);
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+  const [inFlight, setInFlight] = useState<Set<string>>(new Set());
 
   useRealtimeRefresh(supabase, `expenses-${householdId}`, [
     { table: "expenses", filter: `household_id=eq.${householdId}` },
     { table: "expense_splits" },
   ]);
 
+  // Once fresh server data agrees with an optimistic override, drop it so a
+  // later change (ours or a roommate's) isn't masked by stale local state.
+  useEffect(() => {
+    setOverrides((prev) => {
+      const next = { ...prev };
+      for (const expense of expenses) {
+        for (const split of expense.expense_splits) {
+          if (next[split.id] === split.settled) delete next[split.id];
+        }
+      }
+      return next;
+    });
+  }, [expenses]);
+
   const nameById = new Map(members.map((m) => [m.user_id, m.display_name]));
-  const balances = computeBalances(expenses, members);
+  const displayExpenses = expenses.map((expense) => ({
+    ...expense,
+    expense_splits: expense.expense_splits.map((split) =>
+      split.id in overrides ? { ...split, settled: overrides[split.id] } : split
+    ),
+  }));
+  const balances = computeBalances(displayExpenses, members);
 
   async function toggleSettled(splitId: string, settled: boolean) {
-    await setSplitSettled(supabase, splitId, !settled);
-    router.refresh();
+    const next = !settled;
+    setOverrides((prev) => ({ ...prev, [splitId]: next }));
+    setInFlight((prev) => new Set(prev).add(splitId));
+    try {
+      await setSplitSettled(supabase, splitId, next);
+      router.refresh();
+    } catch {
+      setOverrides((prev) => ({ ...prev, [splitId]: settled }));
+    } finally {
+      setInFlight((prev) => {
+        const next = new Set(prev);
+        next.delete(splitId);
+        return next;
+      });
+    }
   }
 
   return (
@@ -71,8 +106,8 @@ export function ExpensesBoard({
       )}
 
       <div className="space-y-3">
-        {expenses.length === 0 && <p className="text-center text-sm text-ink-soft">No expenses logged yet.</p>}
-        {expenses.map((expense) => (
+        {displayExpenses.length === 0 && <p className="text-center text-sm text-ink-soft">No expenses logged yet.</p>}
+        {displayExpenses.map((expense) => (
           <div key={expense.id} className="ruled rounded-xl bg-paper-raised p-4">
             <div className="flex items-baseline justify-between">
               <p className="font-semibold text-ink">{expense.description}</p>
@@ -89,6 +124,7 @@ export function ExpensesBoard({
                     <Checkbox
                       checked={split.settled}
                       onChange={() => toggleSettled(split.id, split.settled)}
+                      disabled={inFlight.has(split.id)}
                       color="var(--color-expenses)"
                       label={`Mark ${nameById.get(split.user_id)}'s share settled`}
                     />

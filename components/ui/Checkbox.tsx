@@ -3,19 +3,22 @@ export function Checkbox({
   onChange,
   color,
   label,
+  disabled,
 }: {
   checked: boolean;
   onChange: () => void;
   color: string;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onChange}
+      disabled={disabled}
       aria-pressed={checked}
       aria-label={label}
-      className="flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition-colors"
+      className="flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition duration-100 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
       style={{
         borderColor: checked ? color : "var(--color-rule)",
         backgroundColor: checked ? color : "transparent",

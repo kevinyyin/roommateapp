@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeRefresh";
@@ -26,14 +26,29 @@ export function GroceriesBoard({
   const supabase = createClient();
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+  const [inFlight, setInFlight] = useState<Set<string>>(new Set());
 
   useRealtimeRefresh(supabase, `groceries-${householdId}`, [
     { table: "grocery_items", filter: `household_id=eq.${householdId}` },
   ]);
 
+  // Once fresh server data agrees with an optimistic override, drop it so a
+  // later change (ours or a roommate's) isn't masked by stale local state.
+  useEffect(() => {
+    setOverrides((prev) => {
+      const next = { ...prev };
+      for (const item of items) {
+        if (next[item.id] === item.bought) delete next[item.id];
+      }
+      return next;
+    });
+  }, [items]);
+
   const nameById = new Map(members.map((m) => [m.user_id, m.display_name]));
-  const pending = items.filter((i) => !i.bought);
-  const bought = items.filter((i) => i.bought);
+  const displayItems = items.map((i) => (i.id in overrides ? { ...i, bought: overrides[i.id] } : i));
+  const pending = displayItems.filter((i) => !i.bought);
+  const bought = displayItems.filter((i) => i.bought);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -49,8 +64,21 @@ export function GroceriesBoard({
   }
 
   async function toggle(item: GroceryItem) {
-    await setGroceryItemBought(supabase, item.id, !item.bought);
-    router.refresh();
+    const next = !item.bought;
+    setOverrides((prev) => ({ ...prev, [item.id]: next }));
+    setInFlight((prev) => new Set(prev).add(item.id));
+    try {
+      await setGroceryItemBought(supabase, item.id, next);
+      router.refresh();
+    } catch {
+      setOverrides((prev) => ({ ...prev, [item.id]: item.bought }));
+    } finally {
+      setInFlight((prev) => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+    }
   }
 
   return (
@@ -72,6 +100,7 @@ export function GroceriesBoard({
                 <Checkbox
                   checked={item.bought}
                   onChange={() => toggle(item)}
+                  disabled={inFlight.has(item.id)}
                   color="var(--color-groceries)"
                   label={`Mark ${item.name} bought`}
                 />
@@ -91,6 +120,7 @@ export function GroceriesBoard({
                 <Checkbox
                   checked={item.bought}
                   onChange={() => toggle(item)}
+                  disabled={inFlight.has(item.id)}
                   color="var(--color-groceries)"
                   label={`Mark ${item.name} needed again`}
                 />
