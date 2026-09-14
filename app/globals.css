@@ -17,14 +17,16 @@
   --color-expenses-tint: #fbebe4;
   --color-chores: #23916f;
   --color-chores-tint: #e4f4ee;
-  --color-groceries: #c98a12;
+  --color-groceries: #8a6410;
   --color-groceries-tint: #faf0dc;
   --color-quiet: #5b46c2;
   --color-quiet-tint: #ece8fa;
   --color-announcements: #b1467c;
   --color-announcements-tint: #f6e8ef;
 
+  /* System status colors — not tied to a category, used for signed states */
   --color-danger: #c23b3b;
+  --color-credit: #186b46;
 }
 
 @theme inline {
@@ -46,6 +48,7 @@
   --color-announcements: var(--color-announcements);
   --color-announcements-tint: var(--color-announcements-tint);
   --color-danger: var(--color-danger);
+  --color-credit: var(--color-credit);
   --font-sans: var(--font-inter);
 }
 

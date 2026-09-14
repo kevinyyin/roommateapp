@@ -20,7 +20,7 @@ export function Checkbox({
       aria-label={label}
       className="flex h-6 w-6 shrink-0 items-center justify-center rounded border-2 transition duration-100 active:scale-90 disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
       style={{
-        borderColor: checked ? color : "var(--color-rule)",
+        borderColor: checked ? color : "var(--color-ink-soft)",
         backgroundColor: checked ? color : "transparent",
       }}
     >

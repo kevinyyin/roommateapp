@@ -109,7 +109,7 @@ export default async function DashboardOverviewPage() {
           <p className="text-xs font-semibold uppercase text-ink-soft">Balance</p>
           <p
             className={`mt-1 text-lg font-bold tabular ${myBalance === 0 ? "text-ink-soft" : myBalance > 0 ? "" : "text-danger"}`}
-            style={myBalance > 0 ? { color: "var(--color-expenses)" } : undefined}
+            style={myBalance > 0 ? { color: "var(--color-credit)" } : undefined}
           >
             {myBalance === 0 ? "Settled" : myBalance > 0 ? `+$${myBalance.toFixed(2)}` : `-$${Math.abs(myBalance).toFixed(2)}`}
           </p>

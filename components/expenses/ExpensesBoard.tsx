@@ -91,7 +91,10 @@ export function ExpensesBoard({
             return (
               <li key={m.user_id} className="flex items-center justify-between text-sm">
                 <span className="text-ink">{m.display_name}</span>
-                <span className={`tabular font-semibold ${balance === 0 ? "text-ink-soft" : balance > 0 ? "" : "text-danger"}`} style={balance > 0 ? { color: "var(--color-expenses)" } : undefined}>
+                <span
+                  className={`tabular font-semibold ${balance === 0 ? "text-ink-soft" : balance > 0 ? "" : "text-danger"}`}
+                  style={balance > 0 ? { color: "var(--color-credit)" } : undefined}
+                >
                   {balance === 0 ? "settled" : balance > 0 ? `+$${balance.toFixed(2)}` : `-$${Math.abs(balance).toFixed(2)}`}
                 </span>
               </li>
@@ -124,9 +127,7 @@ export function ExpensesBoard({
           >
             <div className="flex items-baseline justify-between">
               <p className="font-semibold text-ink">{expense.description}</p>
-              <p className="tabular font-bold" style={{ color: "var(--color-expenses)" }}>
-                ${expense.amount.toFixed(2)}
-              </p>
+              <p className="tabular font-bold text-ink">${expense.amount.toFixed(2)}</p>
             </div>
             <p className="mt-0.5 text-xs text-ink-soft">paid by {nameById.get(expense.payer_id)}</p>
             <ul className="mt-3 space-y-2">
