@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Planner page surface: paper, not cream — a crisp neutral, not a sepia wash */
+  --color-paper: #faf9f6;
+  --color-paper-raised: #ffffff;
+  --color-ink: #23262f;
+  --color-ink-soft: #63677a;
+  --color-rule: #d7dce6;
+
+  /* The one saturated color reserved strictly for things you can press */
+  --color-action: #2451d6;
+  --color-action-soft: #e8edfc;
+
+  /* Category highlighter accents — one lane color per feature */
+  --color-expenses: #d9603f;
+  --color-expenses-tint: #fbebe4;
+  --color-chores: #23916f;
+  --color-chores-tint: #e4f4ee;
+  --color-groceries: #c98a12;
+  --color-groceries-tint: #faf0dc;
+  --color-quiet: #5b46c2;
+  --color-quiet-tint: #ece8fa;
+
+  --color-danger: #c23b3b;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: var(--color-paper);
+  --color-paper-raised: var(--color-paper-raised);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-rule: var(--color-rule);
+  --color-action: var(--color-action);
+  --color-action-soft: var(--color-action-soft);
+  --color-expenses: var(--color-expenses);
+  --color-expenses-tint: var(--color-expenses-tint);
+  --color-chores: var(--color-chores);
+  --color-chores-tint: var(--color-chores-tint);
+  --color-groceries: var(--color-groceries);
+  --color-groceries-tint: var(--color-groceries-tint);
+  --color-quiet: var(--color-quiet);
+  --color-quiet-tint: var(--color-quiet-tint);
+  --color-danger: var(--color-danger);
+  --font-sans: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+
+/* Ruled planner-page lines behind lane content */
+.ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 43px,
+    var(--color-rule) 43px,
+    var(--color-rule) 44px
+  );
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
